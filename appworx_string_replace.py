@@ -1,8 +1,8 @@
 ###UPDATE STRING IN APPWORX .EXP FILE for Process flows/chains.###
-###reated: 8/23/2017###
+###DAVE DESALVO Created: 8/23/2017###
 ###Last updated: 7/9/2019 Added functions###
-
-import fileinput
+###Last update: 12/11/2019 Created two new functions to speed up process###
+###Last update: 12/18/2019 Use class inplace of function###
 
 def string_change(string):
     #Create lists for ^ place holder for search and replace
@@ -21,11 +21,37 @@ def string_change(string):
             count -= 1
     return list_name
 
-def replace(file, a, b):
-    #replace strings in loop
-    with fileinput.FileInput(file, inplace=True) as file:
-        for line in file:
-            print(line.replace(a, b), end='')
+class Replace:
+    def __init__(self, file, search, replace):
+        self.file = file
+        self.search = search
+        self.replace = replace
+    '''REPLACE SINGLE STRING '''
+    def repsingle(self):
+   #open File
+        with open(self.file,"r") as FR:
+            FILE = FR.read()
+        FILE = FILE.replace(self.search, self.replace)
+        #Write to the file
+        with open(self.file,"w") as F:
+            F.write(FILE)     
+    
+    #REPLACE STRINGS FROM A LIST
+    def rep(self):
+        #set variables
+        count = len(self.search)
+        X = 0   
+        #open File
+        with open(self.file,"r") as FR:
+            FILE = FR.read()
+        #change character
+        while X < count:
+            FILE = FILE.replace(self.search[X], self.replace[X])
+            #print(a[X], b[X])
+            X += 1
+            #Write to the file     
+        with open(self.file,"w") as F:
+            F.write(FILE)
 
 #Information to user about this program
 print('This program renames chains/process flows for .exp files\n')
@@ -47,37 +73,36 @@ string2 = string2.upper()
 search_str = string_change(string1)
 replace_str = string_change(string2)
 
-#Perform search and replace for chains.
-
-srch_st1 = ('\``DELETE=', '\``START=', '\``so_predecessors=')
-
-'''Rename string'''
-replace(input_file,string1,string2)
+'''Rename string without changes'''
+strings = Replace(input_file,string1,string2)
+strings.repsingle()
         
 '''Remove new line'''
-replace(input_file,'\n', '``')
+delnewline = Replace(input_file,'\n', '~~')
+delnewline.repsingle()
+
+#Perform search and replace for chains.
+srch_st1 = ('\\~~DELETE=', '\\~~START=', '\\~~so_predecessors=', '\\~~so_pred_ref_names=')
 
 '''Run list search string srch_str'''
 for x in srch_st1:
     '''Remove string replace ^'''
-    replace(input_file, x, '^')
+    repwithcarot = Replace(input_file, x, '^')
+    repwithcarot.repsingle()
     '''Rename ^'''
-    count = len(search_str)
-    count -= 1 #shorten list number
-    while count != -1:
-        replace(input_file, search_str[count], replace_str[count])
-        count -= 1
-                            
-        '''Add srch_st1 back'''
-        replace(input_file,'^',x)
+    repsearchstring = Replace(input_file,search_str,replace_str)
+    repsearchstring.rep()                       
+    '''Add srch_st1 back'''
+    removecarot = Replace(input_file,'^',x)
+    removecarot.repsingle()
+    '''Add new line'''
 
-'''Add new line'''
-replace(input_file,'``', '\n')
+addnewline = Replace(input_file,'~~', '\n')
+addnewline.repsingle()
 
 '''Inactivate schedules'''
-replace(input_file,'aw_active=Y', 'aw_active=N')
+repactive = Replace(input_file,'aw_active=Y', 'aw_active=N')
+repactive.repsingle()
 
 print('Schedules inactive')
 print('Complete')
-
-
