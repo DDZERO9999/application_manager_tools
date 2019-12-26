@@ -1,5 +1,4 @@
 ###UPDATE STRING IN APPWORX .EXP FILE for Process flows/chains.###
-###DAVE DESALVO Created: 9/18/2017###
 ###Last updated: 7/11/2019###
 ###Last update: New functions 12/12/2019###
 ###Added class inplace of functions 12/19/2019###
