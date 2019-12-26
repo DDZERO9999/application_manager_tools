@@ -21,3 +21,6 @@ GROUP BY MODULE
 HAVING COUNT(*) > 7;
 SPOOL off;
 
+--test
+
+
